@@ -26,57 +26,6 @@ function getIndicesOf(searchStr, str, caseSensitive) {
 
 
 //flaw here is: does not account for overlapping phrases. maybe just take one.
-function getTextIndices(inputRaw, phrases){
-  //GET INDICES OF ALL PHRASES
-  sliceIndices = []
-  phrases.forEach(function(d, i){
-    phraseCleaned = d.trim();
-    matchedIndices = getIndicesOf(phraseCleaned, inputRaw);
-    matchedIndices.forEach(function(x){
-      sliceIndices.push({
-        indices:  [x.index, x.index+phraseCleaned.length],
-        phraseId: i, //get a real id later
-        order: x.order,
-        phrase: phraseCleaned
-      })
-    })
-  })
-  slicedIndices = sliceIndices.sort(function(a, b){return a.indices[0] - b.indices[0]});
-  //FILL INDICES OF ALL NON-PHRASES
-  nonRepetitivePhrases = [];
-  startingIndex = 0;
-  secondaryIndex = 0;
-  console.log()
-  slicedIndices.forEach(function(e, i){
-    //get the phrase before each time
-    startingIndex = secondaryIndex;
-    secondaryIndex = e.indices[0];
-    nonRepetitivePhrases.push({
-      indices: [startingIndex, secondaryIndex]
-      , order: 0
-      , phrase: inputRaw.substring(startingIndex, secondaryIndex) + ' '
-      , phraseId: 0
-    })
-    secondaryIndex = e.indices[1]
-  })
-  //COMBINE PHRASES AND NON-PHRASES
-  allPhrases = nonRepetitivePhrases.concat(slicedIndices)
-  allPhrases = allPhrases.sort(function(a, b){return a.indices[0] - b.indices[0]});
-  allPhrases.forEach(function(d, i){
-    prevElement = allPhrases[i-1];
-    if (prevElement) {
-      d.delay = prevElement.phrase.length + prevElement.delay;
-    } else {
-      d.delay = 0;
-    }
-  })
-  return allPhrases;
-}
-
-function supplementVocabulary(doc){
-  doc.match('alisse').tag('Person', 'FemaleName');
-  doc.match('w').tag('Preposition');
-}
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -180,15 +129,24 @@ document.addEventListener('DOMContentLoaded', function() {
   function startSketch(inputRaw, phrases){
     //sentiment = new Sentimood(); to use sentiment to drawn new words
 
+    const axiosLocal = axios.create({
+      baseURL: 'http://localhost:3000',
+      // timeout: 300,
+    });
+
+    test = axiosLocal.get('/processedText');
+    test.then(res => console.log(res))
+
+    // test = axiosLocal.get('/', {
+    //   headers: {
+    //     'Access-Control-Allow-Origin' : '*',
+    //     'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+    //   }
+    // });
+    // console.log(test)
 
 
-    console.log(axios('/test'));
 
-
-    // phrases =  phrases.split("\n");
-    // phrases = phrases.map(function(d){
-    //   return d.trim();
-    // })
     // normalized = nlp(inputRaw); //OPPORTUNITY TO NORMALIZE
     // doc = nlp(normalized.out('text'));
     // supplementVocabulary(doc);
@@ -197,12 +155,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // //GET PHRASES
     // let grams = getPhrases(doc);
     // console.log(grams)
-    // //GET INDICES OF PHRASES WITHIN TEXT ARRAY AND DRAW
     //
-    // //GET INDIDCES ALSO ON BACKEND
-    //
-    // //
-    //
+
     // console.log(getTextIndices(inputRaw, grams))
     // drawText(getTextIndices(inputRaw, grams))
 
