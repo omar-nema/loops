@@ -1,7 +1,28 @@
 body {
   margin: 0;
   padding: 0;
+  background: #f3f3f3;
 }
+
+.canvas {
+  height: 100%;
+  padding: 30px 100px;
+  margin: auto;
+  font-size: 8px;
+  font-family:  'Open Sans';
+  font-weight: 300;
+}
+.fragment {
+  display: inline;
+  // transition: all .8s ease-in-out;
+  border-radius: 2px;
+  opacity: .3;
+}
+
+// .fragment.hidden {
+//   background: #ff9c9c;
+//   color: rgba(0,0,0,.1);
+// }
 
 // background: rgba(0,0,0,.05);
 // z-index: 100;
