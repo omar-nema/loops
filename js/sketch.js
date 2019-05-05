@@ -2,10 +2,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   //DECLARE AND LOAD ASSETS
   var canvas = d3.select('.canvas');
-  axiosLocal = axios.create({baseURL: 'http://localhost:3000'});
-  test = axiosLocal.get('/processedText');
-  test.then(res => {console.log(res); drawText(res.data[0])})
+  // axiosLocal = axios.create({baseURL: 'http://localhost:3000'});
+  // test = axiosLocal.get('/processedText');
+  // test.then(res => {console.log(res); drawText(res.data[0])})
 
+
+
+  var promises = [d3.text('./data/pocnote.txt'), d3.text('./data/phrases.txt')]
+  Promise.all(promises).then(function(values) {
+    inputRaw = values[0];
+    numSections = 10;
+    drawText(startSketch(inputRaw, numSections)[0]);
+  });
 
 
 
@@ -16,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     for (i=0; i < numColumns; i++){
       canvas.append('div').attr('class', 'column');
     }
-    textcolumn1, textcolumn2
+
 
     fragments = canvas.selectAll('.fragment').data(textIndexed, function(d){return d.indices[0]});
 
@@ -50,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (d.order > 1){
         // FIRST HIGHLIGHT THEN REMOVE
         sel = canvas.select('[phraseid="' + d.phraseId + '"]' + '[order="' + (d.order-1) + '"]')['_groups'][0][0];
-        //.
         d3.select(sel)
           .attr('class', 'fragment hidden')
           .transition(200)
