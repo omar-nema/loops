@@ -1,83 +1,23 @@
-//phraseLibrary
-
-
-//
-
-
-//pre parse on server side. just an animation render.
-function getIndicesOf(searchStr, str, caseSensitive) {
-    var searchStrLen = searchStr.length;
-    if (searchStrLen == 0) {
-        return [];
-    }
-    var startIndex = 0, index, indices = [];
-    if (!caseSensitive) {
-        str = str.toLowerCase();
-        searchStr = searchStr.toLowerCase();
-    }
-    var i = 1;
-    while ((index = str.indexOf(searchStr, startIndex)) > -1) {
-        indices.push({index: index, order: i});
-        startIndex = index + searchStrLen;
-        i = i+1;
-    }
-    return indices;
-}
-
-
-//flaw here is: does not account for overlapping phrases. maybe just take one.
-
-
 document.addEventListener('DOMContentLoaded', function() {
 
   //DECLARE AND LOAD ASSETS
-  var promises = [d3.text('./data/pocnote.txt'), d3.text('./data/phrases.txt')]
   var canvas = d3.select('.canvas');
+  axiosLocal = axios.create({baseURL: 'http://localhost:3000'});
+  test = axiosLocal.get('/processedText');
+  test.then(res => {console.log(res); drawText(res.data[0])})
 
-  Promise.all(promises).then(function(values) {
-    inputRaw = values[0];
-    phrases = values[1]
-    startSketch(inputRaw, phrases);
-  });
-
-  function getPhrases(doc){
-    return doc.ngrams().list.filter(function(e){
-      if (e.size == 2 && e.count > 1){
-        if (
-            (e.terms[0].tags['Noun'] && e.terms[1].tags['Noun'] && !e.terms[0].tags['Pronoun'] && !e.terms[1].tags['Pronoun'])
-            ||
-            (e.terms[0].tags['Adjective'] && e.terms[1].tags['Noun'] && !e.terms[0].tags['Pronoun'] && !e.terms[1].tags['Pronoun'])
-          ) {
-            // console.log('PASSED ', e.key);
-            return e.key; //also avail: uid, parent  terms
-          }
-      }
-      else if (e.size == 3 && e.count > 1){
-        //may benefit from verbs. i..e 'work on myself'
-        if
-            ( (e.terms[0].tags['Noun'] || e.terms[0].tags['Adjective']) && (e.terms[2].tags['Noun'] || e.terms[2].tags['Adjective'])
-              &&
-              !(e.terms[0].tags['Pronoun'] && e.terms[1].tags['QuestionWord'] && e.terms[2].tags['Pronoun']) //maybe ake this stricter and not have pronoun sandwich
-            )
-           {
-            return e.key;
-          }
-      }
-      else if (e.size > 3 && e.count > 5){
-        return e.key;
-      }
-      // for unigrams, only take if high frequency and charged sentiment. not super effective. need to adjust library.
-      // else if (e.size == 1 && e.count > 10 ){
-      //   if (Math.abs(sentiment.analyze(e.key)['score']) > 1){
-      //     console.log(e.key,   sentiment.analyze(e.key))
-      //   }
-      // }
-    }).map(function(i){return i.key})
-  }
 
 
 
   function drawText(textIndexed){
+
+
+    numColumns = 10;
+    for (i=0; i < numColumns; i++){
+      canvas.append('div').attr('class', 'column');
+    }
+    textcolumn1, textcolumn2
+
     fragments = canvas.selectAll('.fragment').data(textIndexed, function(d){return d.indices[0]});
 
     fragments.enter().append('div')
@@ -119,49 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
           .transition(200)
           .delay(400)
           .style('background', 'rgb(99, 99, 225)')
-          .style('color', 'gray')
+          .style('color', 'white')
         ;
       }
     })
   }
 
 
-  function startSketch(inputRaw, phrases){
-    //sentiment = new Sentimood(); to use sentiment to drawn new words
-
-    const axiosLocal = axios.create({
-      baseURL: 'http://localhost:3000',
-      // timeout: 300,
-    });
-
-    test = axiosLocal.get('/processedText');
-    test.then(res => console.log(res))
-
-    // test = axiosLocal.get('/', {
-    //   headers: {
-    //     'Access-Control-Allow-Origin' : '*',
-    //     'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-    //   }
-    // });
-    // console.log(test)
-
-
-
-    // normalized = nlp(inputRaw); //OPPORTUNITY TO NORMALIZE
-    // doc = nlp(normalized.out('text'));
-    // supplementVocabulary(doc);
-    // let topics = doc.topics().unique().data().map(function(d){return d.text});
-    //
-    // //GET PHRASES
-    // let grams = getPhrases(doc);
-    // console.log(grams)
-    //
-
-    // console.log(getTextIndices(inputRaw, grams))
-    // drawText(getTextIndices(inputRaw, grams))
-
-
-}
 }, false);
 
 

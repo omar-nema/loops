@@ -125,7 +125,7 @@ server.get('/processedText',(request,response)=>{
   grams = getPhrases(doc);
   console.log('phrases processed. next: get indexed array');
   indexedArr = getTextIndices(inputRaw, grams)
-  response.send(indexedArr);
+  response.send([indexedArr, inputRaw.length]);
 });
 
 //Binding to a port

@@ -1,4 +1,10 @@
 
+  var promises = [d3.text('./data/pocnote.txt'), d3.text('./data/phrases.txt')]
+  Promise.all(promises).then(function(values) {
+    inputRaw = values[0];
+    phrases = values[1]
+    startSketch(inputRaw, phrases);
+  });
 
 //use async.each() to parse in parallel
 
