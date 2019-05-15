@@ -112,6 +112,7 @@ function getPhrases(doc){
           // console.log('PASSED ', e.key);
           return e.key; //also avail: uid, parent  terms
         }
+
     }
     else if (e.size == 3 && e.count > 1){
       //may benefit from verbs. i..e 'work on myself'
@@ -123,6 +124,7 @@ function getPhrases(doc){
          {
           return e.key;
         }
+
     }
     else if (e.size > 3 && e.count > 5){
       return e.key;
@@ -144,8 +146,12 @@ function startSketch(inputRaw, numSections){
   console.log('starting to process text')
   doc= nlp(inputRaw).normalize();
   supplementVocabulary(doc);
+
+  console.log('topics', doc.topics().data() )
+
   grams = getPhrases(doc);
   console.log('phrases processed. next: get indexed array');
+  console.log(grams)
   indexedArr = getTextIndices(inputRaw, grams, numSections)
   console.log('done', indexedArr)
   return [indexedArr, inputRaw.length]
